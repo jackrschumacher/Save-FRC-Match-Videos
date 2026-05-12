@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TBA YouTube Link Extractor</title>
+    <title>Save FRC match videos from The Blue Alliance</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -21,18 +22,48 @@
             margin-bottom: 2rem;
         }
         h1 { color: #3f51b5; margin-top: 0; }
-        .form-group { margin-bottom: 1rem; }
+        
+        .docs-box {
+            background: #e8eaf6;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #3f51b5;
+        }
+        .docs-box summary {
+            font-weight: bold;
+            cursor: pointer;
+            color: #303f9f;
+        }
+        .docs-box ol {
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+            padding-left: 1.5rem;
+        }
+
+        .form-group { margin-bottom: 1rem; position: relative; }
         label { display: block; font-weight: bold; margin-bottom: 0.5rem; }
-        input[type="text"], input[type="number"] {
+        input[type="text"], input[type="number"], select {
             width: 100%; padding: 0.5rem; box-sizing: border-box;
             border: 1px solid #ccc; border-radius: 4px;
+            background-color: white; font-size: 1rem;
         }
+        
+        /* New styles for the clear key button */
+        .input-wrapper { display: flex; gap: 0.5rem; }
+        .btn-clear {
+            background-color: #e0e0e0; color: #333; border: none;
+            padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-clear:hover { background-color: #ccc; }
+
         button {
             background-color: #3f51b5; color: white; border: none;
             padding: 0.75rem 1.5rem; border-radius: 4px; cursor: pointer;
             font-size: 1rem; font-weight: bold; margin-right: 0.5rem; margin-bottom: 0.5rem;
         }
-        button:hover { background-color: #303f9f; }
+        button.main-btn:hover { background-color: #303f9f; }
         button:disabled { background-color: #9fa8da; cursor: not-allowed; }
         
         .btn-success { background-color: #4caf50; }
@@ -44,34 +75,57 @@
         table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
         th, td { text-align: left; padding: 12px; border-bottom: 1px solid #ddd; }
         th { background-color: #f8f9fa; }
+        .event-code { font-size: 0.85em; color: #666; display: block; margin-top: 2px; }
         a { color: #d32f2f; text-decoration: none; font-weight: bold; }
         a:hover { text-decoration: underline; }
         #status { margin-top: 1rem; font-style: italic; color: #666; }
+        .saved-badge { color: #4caf50; font-size: 0.85rem; font-weight: bold; display: none; margin-left: 0.5rem; }
+        
+        /* Style for the GitHub link */
+        .github-link { display: inline-block; margin-bottom: 1.5rem; font-size: 0.9rem;  }
     </style>
 </head>
 <body>
 
     <div class="card">
-        <h1>TBA Video Extractor</h1>
-        <p>Pull organized YouTube links for any FRC team directly from The Blue Alliance API.</p>
+        <h1>Save FRC match videos from The Blue Alliance</h1>
+        <p style="margin-bottom: 0.5rem;">Pull organized YouTube links for any FRC team directly from The Blue Alliance API.</p>
+        <a href="https://github.com/jackrschumacher/grade-calculator/blob/main/index.html" target="_blank" class="github-link">View Source Code on GitHub</a>
+        
+        
+        <details class="docs-box">
+            <summary>How do I get a free TBA API Key?</summary>
+            <ol>
+                <li>Go to <a href="https://www.thebluealliance.com/account" target="_blank">thebluealliance.com/account</a> and log in.</li>
+                <li>Scroll down to the <strong>Read API Keys</strong> section.</li>
+                <li>Type a description (like "Video Extractor") into the text box and click <strong>Add New Key</strong>.</li>
+                <li>Copy the long string of letters and numbers it generates and paste it into the field below.</li>
+            </ol>
+        </details>
         
         <div class="form-group">
-            <label for="apiKey">TBA API Read Key (Required):</label>
-            <input type="text" id="apiKey" placeholder="Paste your API key from thebluealliance.com/account">
+            <label for="apiKey">
+                TBA API Read Key:
+                <span id="savedBadge" class="saved-badge">✓ Saved in browser</span>
+            </label>
+            <div class="input-wrapper">
+                <input type="text" id="apiKey" placeholder="Paste your API key here...">
+                <button type="button" class="btn-clear" onclick="clearApiKey()" title="Remove saved key">Clear</button>
+            </div>
         </div>
         
         <div style="display: flex; gap: 1rem;">
             <div class="form-group" style="flex: 1;">
                 <label for="teamNumber">Team Number:</label>
-                <input type="number" id="teamNumber" placeholder="e.g., 930" value="930">
+                <input type="number" id="teamNumber" placeholder="e.g., 930" value="930" min="1">
             </div>
             <div class="form-group" style="flex: 1;">
                 <label for="year">Year:</label>
-                <input type="number" id="year" placeholder="e.g., 2024" value="2024">
+                <select id="year"></select>
             </div>
         </div>
 
-        <button id="fetchBtn" onclick="fetchVideos()">Fetch Matches</button>
+        <button id="fetchBtn" class="main-btn" onclick="fetchVideos()">Fetch Matches</button>
         <button id="exportBtn" class="btn-success" onclick="exportToCSV()" style="display: none;">Export to CSV</button>
         <button id="playlistBtn" class="btn-youtube" onclick="openPlaylist()" style="display: none;">▶ Open as YouTube Playlist</button>
         
@@ -92,15 +146,53 @@
                 </tbody>
         </table>
     </div>
-
+    
     <script>
         let globalMatchData = [];
         let globalVideoIds = [];
 
+        window.onload = function() {
+            // 1. Populate the year dropdown
+            const currentYear = new Date().getFullYear();
+            const startYear = 1992;
+            const yearSelect = document.getElementById('year');
+            
+            for (let y = currentYear; y >= startYear; y--) {
+                const option = document.createElement('option');
+                option.value = y;
+                option.text = y;
+                yearSelect.appendChild(option);
+            }
+
+            // 2. Load API Key from localStorage
+            const savedKey = localStorage.getItem('tbaApiKey');
+            if (savedKey) {
+                document.getElementById('apiKey').value = savedKey;
+                document.getElementById('savedBadge').style.display = 'inline';
+            }
+        };
+
+        function clearApiKey() {
+            localStorage.removeItem('tbaApiKey');
+            document.getElementById('apiKey').value = '';
+            document.getElementById('savedBadge').style.display = 'none';
+        }
+
+        // Helper function for formatting matches
+        function formatMatchName(comp_level, set_number, match_number) {
+            const levels = { 'qm': 'Quals', 'ef': 'Eighths', 'qf': 'Quarters', 'sf': 'Semis', 'f': 'Finals' };
+            const levelName = levels[comp_level] || comp_level.toUpperCase();
+            if (comp_level === 'qm') {
+                return `${levelName} ${match_number}`;
+            } else {
+                return `${levelName} ${set_number}-${match_number}`;
+            }
+        }
+
         async function fetchVideos() {
             const apiKey = document.getElementById('apiKey').value.trim();
             const teamNumber = document.getElementById('teamNumber').value.trim();
-            const year = document.getElementById('year').value.trim();
+            const year = document.getElementById('year').value;
             const statusDiv = document.getElementById('status');
             const resultsCard = document.getElementById('resultsCard');
             const resultsBody = document.getElementById('resultsBody');
@@ -119,18 +211,30 @@
             globalMatchData = [];
             globalVideoIds = [];
 
-            const tbaEndpoint = `https://www.thebluealliance.com/api/v3/team/frc${teamNumber}/matches/${year}`;
+            const matchesEndpoint = `https://www.thebluealliance.com/api/v3/team/frc${teamNumber}/matches/${year}`;
+            const eventsEndpoint = `https://www.thebluealliance.com/api/v3/team/frc${teamNumber}/events/${year}/simple`;
 
             try {
-                const response = await fetch(tbaEndpoint, {
-                    headers: { 'X-TBA-Auth-Key': apiKey }
-                });
+                const [matchesRes, eventsRes] = await Promise.all([
+                    fetch(matchesEndpoint, { headers: { 'X-TBA-Auth-Key': apiKey } }),
+                    fetch(eventsEndpoint, { headers: { 'X-TBA-Auth-Key': apiKey } })
+                ]);
 
-                if (!response.ok) {
-                    throw new Error(`API Error: ${response.status} ${response.statusText}`);
+                if (!matchesRes.ok || !eventsRes.ok) {
+                    throw new Error("API Error: Check your API Key or Team Number.");
                 }
 
-                const matches = await response.json();
+                // If the fetch was successful, save the key to the browser
+                localStorage.setItem('tbaApiKey', apiKey);
+                document.getElementById('savedBadge').style.display = 'inline';
+
+                const matches = await matchesRes.json();
+                const events = await eventsRes.json();
+
+                const eventDict = {};
+                events.forEach(e => {
+                    eventDict[e.key] = e.name;
+                });
                 
                 const matchesWithVideos = matches.filter(match => match.videos && match.videos.length > 0);
 
@@ -143,23 +247,32 @@
                     return;
                 }
 
-                matchesWithVideos.sort((a, b) => a.event_key.localeCompare(b.event_key) || a.match_number - b.match_number);
+                const levelOrder = { 'qm': 1, 'ef': 2, 'qf': 3, 'sf': 4, 'f': 5 };
+                
+                matchesWithVideos.sort((a, b) => {
+                    if (a.event_key !== b.event_key) return a.event_key.localeCompare(b.event_key);
+                    if (levelOrder[a.comp_level] !== levelOrder[b.comp_level]) return levelOrder[a.comp_level] - levelOrder[b.comp_level];
+                    if (a.set_number !== b.set_number) return a.set_number - b.set_number;
+                    return a.match_number - b.match_number;
+                });
 
                 matchesWithVideos.forEach(match => {
                     match.videos.forEach(video => {
                         if (video.type === 'youtube') {
-                            const eventName = match.event_key.toUpperCase();
-                            const matchName = `${match.comp_level.toUpperCase()} ${match.match_number}`;
+                            const fullEventName = eventDict[match.event_key] || match.event_key;
+                            const eventCode = match.event_key.toUpperCase();
+                            const matchName = formatMatchName(match.comp_level, match.set_number, match.match_number);
                             const youtubeUrl = `https://www.youtube.com/watch?v=${video.key}`;
 
-                            // Save for CSV and Playlist
-                            globalMatchData.push({ event: eventName, match: matchName, url: youtubeUrl });
+                            globalMatchData.push({ event: fullEventName, code: eventCode, match: matchName, url: youtubeUrl });
                             globalVideoIds.push(video.key);
 
-                            // Add to HTML table
                             const tr = document.createElement('tr');
                             tr.innerHTML = `
-                                <td>${eventName}</td>
+                                <td>
+                                    <strong>${fullEventName}</strong>
+                                    <span class="event-code">${eventCode}</span>
+                                </td>
                                 <td>${matchName}</td>
                                 <td><a href="${youtubeUrl}" target="_blank">Watch on YouTube ↗</a></td>
                             `;
@@ -183,20 +296,17 @@
 
         function exportToCSV() {
             if (globalMatchData.length === 0) return;
-
-            let csvContent = "Event,Match,YouTube Link\n";
+            let csvContent = "Event Name,Event Code,Match,YouTube Link\n";
             globalMatchData.forEach(row => {
-                csvContent += `${row.event},${row.match},${row.url}\n`;
+                const escapedEvent = `"${row.event}"`;
+                csvContent += `${escapedEvent},${row.code},${row.match},${row.url}\n`;
             });
-
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
-            
             link.setAttribute("href", url);
             link.setAttribute("download", `team_${document.getElementById('teamNumber').value}_videos_${document.getElementById('year').value}.csv`);
             link.style.visibility = 'hidden';
-            
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -204,22 +314,17 @@
 
         function openPlaylist() {
             if (globalVideoIds.length === 0) return;
-
-            // YouTube's anonymous playlist limit is ~50 videos. We chunk them if there are more.
             const chunkSize = 50;
-            
             if (globalVideoIds.length > chunkSize) {
                 alert(`You have ${globalVideoIds.length} videos. YouTube limits these playlists to 50 videos each. We will open multiple tabs for you.`);
             }
-
             for (let i = 0; i < globalVideoIds.length; i += chunkSize) {
                 const chunk = globalVideoIds.slice(i, i + chunkSize);
                 const playlistUrl = `https://www.youtube.com/watch_videos?video_ids=${chunk.join(',')}`;
-                
-                // Open each chunk in a new tab
                 window.open(playlistUrl, '_blank');
             }
         }
     </script>
+    
 </body>
 </html>
