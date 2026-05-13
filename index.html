@@ -132,7 +132,7 @@
         <div style="display: flex; gap: 1rem;">
             <div class="form-group" style="flex: 1;">
                 <label for="teamNumber">Team Number:</label>
-                <input type="number" id="teamNumber" placeholder="e.g., 930" value="" min="1">
+                <input type="number" id="teamNumber" placeholder="e.g., 930" value="930" min="1">
             </div>
             <div class="form-group" style="flex: 1;">
                 <label for="year">Year:</label>
@@ -404,12 +404,21 @@
                 const escapedEvent = `"${row.eventName}"`;
                 csvContent += `${escapedEvent},${row.eventCode},${row.matchName},${row.resultText},${row.scoreText},${row.url}\n`;
             });
+            
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
+            
+            // Generate a dynamic filename based on the current filter selection
+            const teamNum = document.getElementById('teamNumber').value;
+            const yearNum = document.getElementById('year').value;
+            const filterMode = document.getElementById('filterMode').value;
+            const filterSuffix = filterMode === 'all' ? 'all_matches' : `${filterMode}s_only`;
+            
             link.setAttribute("href", url);
-            link.setAttribute("download", `team_${document.getElementById('teamNumber').value}_videos_${document.getElementById('year').value}.csv`);
+            link.setAttribute("download", `team_${teamNum}_videos_${yearNum}_${filterSuffix}.csv`);
             link.style.visibility = 'hidden';
+            
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
