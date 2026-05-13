@@ -49,7 +49,6 @@
             background-color: white; font-size: 1rem;
         }
         
-        /* New styles for the clear key button */
         .input-wrapper { display: flex; gap: 0.5rem; }
         .btn-clear {
             background-color: #e0e0e0; color: #333; border: none;
@@ -81,8 +80,25 @@
         #status { margin-top: 1rem; font-style: italic; color: #666; }
         .saved-badge { color: #4caf50; font-size: 0.85rem; font-weight: bold; display: none; margin-left: 0.5rem; }
         
-        /* Style for the GitHub link */
         .github-link { display: inline-block; margin-bottom: 1.5rem; font-size: 0.9rem;  }
+
+        /* Match Result Badges */
+        .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.85em; text-transform: uppercase; }
+        .badge.win { background-color: #e8f5e9; color: #2e7d32; }
+        .badge.loss { background-color: #ffebee; color: #c62828; }
+        .badge.tie { background-color: #fff8e1; color: #f57f17; }
+        .badge.na { background-color: #f5f5f5; color: #9e9e9e; }
+        
+        /* The specific fix for the wrapping score text */
+        .score-text { 
+            font-size: 0.8em; 
+            color: #555; 
+            margin-top: 4px; 
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap; 
+        }
+        
+        .controls-row { display: flex; gap: 1rem; margin-bottom: 1rem; background: #f8f9fa; padding: 1rem; border-radius: 8px; border: 1px solid #eee; }
     </style>
 </head>
 <body>
@@ -91,7 +107,6 @@
         <h1>Save FRC match videos from The Blue Alliance</h1>
         <p style="margin-bottom: 0.5rem;">Pull organized YouTube links for any FRC team directly from The Blue Alliance API.</p>
         <a href="https://github.com/jackrschumacher/Save-FRC-Match-Videos" target="_blank" class="github-link">View Source Code on GitHub</a>
-        
         
         <details class="docs-box">
             <summary>How do I get a free TBA API Key?</summary>
@@ -117,7 +132,7 @@
         <div style="display: flex; gap: 1rem;">
             <div class="form-group" style="flex: 1;">
                 <label for="teamNumber">Team Number:</label>
-                <input type="number" id="teamNumber" placeholder="e.g., 930" value="0" min="1">
+                <input type="number" id="teamNumber" placeholder="e.g., 930" value="" min="1">
             </div>
             <div class="form-group" style="flex: 1;">
                 <label for="year">Year:</label>
@@ -134,11 +149,33 @@
 
     <div class="card" id="resultsCard" style="display: none;">
         <h2>Match Videos</h2>
+        
+        <div class="controls-row">
+            <div style="flex: 1;">
+                <label for="filterMode" style="font-size: 0.9em;">Filter by Result:</label>
+                <select id="filterMode" onchange="renderTable()">
+                    <option value="all">All Matches</option>
+                    <option value="win">Wins Only</option>
+                    <option value="loss">Losses Only</option>
+                    <option value="tie">Ties Only</option>
+                </select>
+            </div>
+            <div style="flex: 1;">
+                <label for="sortMode" style="font-size: 0.9em;">Sort Order:</label>
+                <select id="sortMode" onchange="renderTable()">
+                    <option value="chrono">Chronological</option>
+                    <option value="eventName">By Event Name (A-Z)</option>
+                    <option value="result">By Result (Wins First)</option>
+                </select>
+            </div>
+        </div>
+
         <table id="resultsTable">
             <thead>
                 <tr>
                     <th>Event</th>
                     <th>Match</th>
+                    <th>Result</th>
                     <th>Link</th>
                 </tr>
             </thead>
@@ -149,10 +186,10 @@
     
     <script>
         let globalMatchData = [];
-        let globalVideoIds = [];
+        let globalFilteredData = [];
+        let globalFilteredVideoIds = [];
 
         window.onload = function() {
-            // 1. Populate the year dropdown
             const currentYear = new Date().getFullYear();
             const startYear = 1992;
             const yearSelect = document.getElementById('year');
@@ -164,7 +201,6 @@
                 yearSelect.appendChild(option);
             }
 
-            // 2. Load API Key from localStorage
             const savedKey = localStorage.getItem('tbaApiKey');
             if (savedKey) {
                 document.getElementById('apiKey').value = savedKey;
@@ -178,7 +214,6 @@
             document.getElementById('savedBadge').style.display = 'none';
         }
 
-        // Helper function for formatting matches
         function formatMatchName(comp_level, set_number, match_number) {
             const levels = { 'qm': 'Quals', 'ef': 'Eighths', 'qf': 'Quarters', 'sf': 'Semis', 'f': 'Finals' };
             const levelName = levels[comp_level] || comp_level.toUpperCase();
@@ -194,10 +229,6 @@
             const teamNumber = document.getElementById('teamNumber').value.trim();
             const year = document.getElementById('year').value;
             const statusDiv = document.getElementById('status');
-            const resultsCard = document.getElementById('resultsCard');
-            const resultsBody = document.getElementById('resultsBody');
-            const exportBtn = document.getElementById('exportBtn');
-            const playlistBtn = document.getElementById('playlistBtn');
             const fetchBtn = document.getElementById('fetchBtn');
 
             if (!apiKey) {
@@ -207,9 +238,7 @@
 
             statusDiv.textContent = "Fetching data from The Blue Alliance...";
             fetchBtn.disabled = true;
-            resultsBody.innerHTML = '';
             globalMatchData = [];
-            globalVideoIds = [];
 
             const matchesEndpoint = `https://www.thebluealliance.com/api/v3/team/frc${teamNumber}/matches/${year}`;
             const eventsEndpoint = `https://www.thebluealliance.com/api/v3/team/frc${teamNumber}/events/${year}/simple`;
@@ -224,7 +253,6 @@
                     throw new Error("API Error: Check your API Key or Team Number.");
                 }
 
-                // If the fetch was successful, save the key to the browser
                 localStorage.setItem('tbaApiKey', apiKey);
                 document.getElementById('savedBadge').style.display = 'inline';
 
@@ -232,59 +260,74 @@
                 const events = await eventsRes.json();
 
                 const eventDict = {};
-                events.forEach(e => {
-                    eventDict[e.key] = e.name;
-                });
+                events.forEach(e => { eventDict[e.key] = e.name; });
                 
                 const matchesWithVideos = matches.filter(match => match.videos && match.videos.length > 0);
 
                 if (matchesWithVideos.length === 0) {
                     statusDiv.textContent = `No videos found for Team ${teamNumber} in ${year}.`;
-                    resultsCard.style.display = 'none';
-                    exportBtn.style.display = 'none';
-                    playlistBtn.style.display = 'none';
+                    document.getElementById('resultsCard').style.display = 'none';
+                    document.getElementById('exportBtn').style.display = 'none';
+                    document.getElementById('playlistBtn').style.display = 'none';
                     fetchBtn.disabled = false;
                     return;
                 }
 
-                const levelOrder = { 'qm': 1, 'ef': 2, 'qf': 3, 'sf': 4, 'f': 5 };
-                
-                matchesWithVideos.sort((a, b) => {
-                    if (a.event_key !== b.event_key) return a.event_key.localeCompare(b.event_key);
-                    if (levelOrder[a.comp_level] !== levelOrder[b.comp_level]) return levelOrder[a.comp_level] - levelOrder[b.comp_level];
-                    if (a.set_number !== b.set_number) return a.set_number - b.set_number;
-                    return a.match_number - b.match_number;
-                });
+                const targetTeam = `frc${teamNumber}`;
 
                 matchesWithVideos.forEach(match => {
                     match.videos.forEach(video => {
                         if (video.type === 'youtube') {
-                            const fullEventName = eventDict[match.event_key] || match.event_key;
-                            const eventCode = match.event_key.toUpperCase();
-                            const matchName = formatMatchName(match.comp_level, match.set_number, match.match_number);
-                            const youtubeUrl = `https://www.youtube.com/watch?v=${video.key}`;
+                            
+                            let alliance = null;
+                            if (match.alliances.red.team_keys.includes(targetTeam)) alliance = 'red';
+                            else if (match.alliances.blue.team_keys.includes(targetTeam)) alliance = 'blue';
 
-                            globalMatchData.push({ event: fullEventName, code: eventCode, match: matchName, url: youtubeUrl });
-                            globalVideoIds.push(video.key);
+                            let resultText = "N/A";
+                            let resultClass = "na";
+                            let resultSortVal = 4;
+                            let scoreText = "";
 
-                            const tr = document.createElement('tr');
-                            tr.innerHTML = `
-                                <td>
-                                    <strong>${fullEventName}</strong>
-                                    <span class="event-code">${eventCode}</span>
-                                </td>
-                                <td>${matchName}</td>
-                                <td><a href="${youtubeUrl}" target="_blank">Watch on YouTube ↗</a></td>
-                            `;
-                            resultsBody.appendChild(tr);
+                            if (alliance && match.alliances.red.score >= 0 && match.alliances.blue.score >= 0) {
+                                const myScore = match.alliances[alliance].score;
+                                const oppAlliance = alliance === 'red' ? 'blue' : 'red';
+                                const oppScore = match.alliances[oppAlliance].score;
+                                scoreText = `${myScore} - ${oppScore}`;
+
+                                if (match.winning_alliance === alliance) {
+                                    resultText = "Win"; resultClass = "win"; resultSortVal = 1;
+                                } else if (match.winning_alliance === oppAlliance) {
+                                    resultText = "Loss"; resultClass = "loss"; resultSortVal = 3;
+                                } else {
+                                    resultText = "Tie"; resultClass = "tie"; resultSortVal = 2;
+                                }
+                            }
+
+                            globalMatchData.push({
+                                eventName: eventDict[match.event_key] || match.event_key,
+                                eventCode: match.event_key.toUpperCase(),
+                                comp_level: match.comp_level,
+                                set_number: match.set_number,
+                                match_number: match.match_number,
+                                matchName: formatMatchName(match.comp_level, match.set_number, match.match_number),
+                                url: `https://www.youtube.com/watch?v=${video.key}`,
+                                videoId: video.key,
+                                resultText: resultText,
+                                resultClass: resultClass,
+                                resultSortVal: resultSortVal,
+                                scoreText: scoreText
+                            });
                         }
                     });
                 });
 
-                statusDiv.textContent = `Found ${globalMatchData.length} videos!`;
-                resultsCard.style.display = 'block';
-                exportBtn.style.display = 'inline-block';
-                playlistBtn.style.display = 'inline-block';
+                statusDiv.textContent = `Found ${globalMatchData.length} total videos!`;
+                
+                document.getElementById('resultsCard').style.display = 'block';
+                document.getElementById('exportBtn').style.display = 'inline-block';
+                document.getElementById('playlistBtn').style.display = 'inline-block';
+                
+                renderTable();
 
             } catch (error) {
                 statusDiv.textContent = `Error: ${error.message}`;
@@ -294,12 +337,72 @@
             }
         }
 
+        function renderTable() {
+            const resultsBody = document.getElementById('resultsBody');
+            const filterMode = document.getElementById('filterMode').value;
+            const sortMode = document.getElementById('sortMode').value;
+            
+            resultsBody.innerHTML = '';
+            globalFilteredVideoIds = [];
+
+            globalFilteredData = globalMatchData.filter(row => {
+                if (filterMode === 'all') return true;
+                if (filterMode === 'win' && row.resultClass === 'win') return true;
+                if (filterMode === 'loss' && row.resultClass === 'loss') return true;
+                if (filterMode === 'tie' && row.resultClass === 'tie') return true;
+                return false;
+            });
+
+            const levelOrder = { 'qm': 1, 'ef': 2, 'qf': 3, 'sf': 4, 'f': 5 };
+            
+            globalFilteredData.sort((a, b) => {
+                // Primary Sort: Result
+                if (sortMode === 'result' && a.resultSortVal !== b.resultSortVal) {
+                    return a.resultSortVal - b.resultSortVal;
+                }
+                
+                // Primary Sort: Event Name
+                if (sortMode === 'eventName' && a.eventName !== b.eventName) {
+                    return a.eventName.localeCompare(b.eventName);
+                }
+                
+                // Fallback / Chronological secondary sorting
+                if (a.eventCode !== b.eventCode) return a.eventCode.localeCompare(b.eventCode);
+                if (levelOrder[a.comp_level] !== levelOrder[b.comp_level]) return levelOrder[a.comp_level] - levelOrder[b.comp_level];
+                if (a.set_number !== b.set_number) return a.set_number - b.set_number;
+                return a.match_number - b.match_number;
+            });
+
+            globalFilteredData.forEach(row => {
+                globalFilteredVideoIds.push(row.videoId);
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>
+                        <strong>${row.eventName}</strong>
+                        <span class="event-code">${row.eventCode}</span>
+                    </td>
+                    <td>${row.matchName}</td>
+                    <td>
+                        <span class="badge ${row.resultClass}">${row.resultText}</span>
+                        ${row.scoreText ? `<div class="score-text">${row.scoreText}</div>` : ''}
+                    </td>
+                    <td><a href="${row.url}" target="_blank">Watch on YouTube ↗</a></td>
+                `;
+                resultsBody.appendChild(tr);
+            });
+            
+            if (globalFilteredData.length === 0) {
+                resultsBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color: #666;">No matches match your current filter.</td></tr>`;
+            }
+        }
+
         function exportToCSV() {
-            if (globalMatchData.length === 0) return;
-            let csvContent = "Event Name,Event Code,Match,YouTube Link\n";
-            globalMatchData.forEach(row => {
-                const escapedEvent = `"${row.event}"`;
-                csvContent += `${escapedEvent},${row.code},${row.match},${row.url}\n`;
+            if (globalFilteredData.length === 0) return;
+            let csvContent = "Event Name,Event Code,Match,Result,Score,YouTube Link\n";
+            globalFilteredData.forEach(row => {
+                const escapedEvent = `"${row.eventName}"`;
+                csvContent += `${escapedEvent},${row.eventCode},${row.matchName},${row.resultText},${row.scoreText},${row.url}\n`;
             });
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
@@ -313,13 +416,13 @@
         }
 
         function openPlaylist() {
-            if (globalVideoIds.length === 0) return;
+            if (globalFilteredVideoIds.length === 0) return;
             const chunkSize = 50;
-            if (globalVideoIds.length > chunkSize) {
-                alert(`You have ${globalVideoIds.length} videos. YouTube limits these playlists to 50 videos each. We will open multiple tabs for you.`);
+            if (globalFilteredVideoIds.length > chunkSize) {
+                alert(`You have ${globalFilteredVideoIds.length} videos. YouTube limits these playlists to 50 videos each. We will open multiple tabs for you.`);
             }
-            for (let i = 0; i < globalVideoIds.length; i += chunkSize) {
-                const chunk = globalVideoIds.slice(i, i + chunkSize);
+            for (let i = 0; i < globalFilteredVideoIds.length; i += chunkSize) {
+                const chunk = globalFilteredVideoIds.slice(i, i + chunkSize);
                 const playlistUrl = `https://www.youtube.com/watch_videos?video_ids=${chunk.join(',')}`;
                 window.open(playlistUrl, '_blank');
             }
