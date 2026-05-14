@@ -152,6 +152,12 @@
         
         <div class="controls-row">
             <div style="flex: 1;">
+                <label for="eventFilter" style="font-size: 0.9em;">Filter by Event:</label>
+                <select id="eventFilter" onchange="renderTable()">
+                    <option value="all">All Events</option>
+                    </select>
+            </div>
+            <div style="flex: 1;">
                 <label for="filterMode" style="font-size: 0.9em;">Filter by Result:</label>
                 <select id="filterMode" onchange="renderTable()">
                     <option value="all">All Matches</option>
@@ -230,6 +236,7 @@
             const year = document.getElementById('year').value;
             const statusDiv = document.getElementById('status');
             const fetchBtn = document.getElementById('fetchBtn');
+            const eventFilter = document.getElementById('eventFilter');
 
             if (!apiKey) {
                 alert("Please enter your TBA API Key.");
@@ -239,6 +246,7 @@
             statusDiv.textContent = "Fetching data from The Blue Alliance...";
             fetchBtn.disabled = true;
             globalMatchData = [];
+            eventFilter.innerHTML = '<option value="all">All Events</option>'; // Reset event filter
 
             const matchesEndpoint = `https://www.thebluealliance.com/api/v3/team/frc${teamNumber}/matches/${year}`;
             const eventsEndpoint = `https://www.thebluealliance.com/api/v3/team/frc${teamNumber}/events/${year}/simple`;
@@ -321,6 +329,16 @@
                     });
                 });
 
+                // Populate the new Event Filter dropdown based on the fetched data
+                const uniqueEventCodes = [...new Set(globalMatchData.map(item => item.eventCode))];
+                uniqueEventCodes.forEach(code => {
+                    const eventName = globalMatchData.find(item => item.eventCode === code).eventName;
+                    const option = document.createElement('option');
+                    option.value = code;
+                    option.text = eventName;
+                    eventFilter.appendChild(option);
+                });
+
                 statusDiv.textContent = `Found ${globalMatchData.length} total videos!`;
                 
                 document.getElementById('resultsCard').style.display = 'block';
@@ -339,6 +357,7 @@
 
         function renderTable() {
             const resultsBody = document.getElementById('resultsBody');
+            const eventFilter = document.getElementById('eventFilter').value;
             const filterMode = document.getElementById('filterMode').value;
             const sortMode = document.getElementById('sortMode').value;
             
@@ -346,11 +365,15 @@
             globalFilteredVideoIds = [];
 
             globalFilteredData = globalMatchData.filter(row => {
-                if (filterMode === 'all') return true;
-                if (filterMode === 'win' && row.resultClass === 'win') return true;
-                if (filterMode === 'loss' && row.resultClass === 'loss') return true;
-                if (filterMode === 'tie' && row.resultClass === 'tie') return true;
-                return false;
+                // Apply Event Filter
+                if (eventFilter !== 'all' && row.eventCode !== eventFilter) return false;
+                
+                // Apply Result Filter
+                if (filterMode === 'win' && row.resultClass !== 'win') return false;
+                if (filterMode === 'loss' && row.resultClass !== 'loss') return false;
+                if (filterMode === 'tie' && row.resultClass !== 'tie') return false;
+                
+                return true;
             });
 
             const levelOrder = { 'qm': 1, 'ef': 2, 'qf': 3, 'sf': 4, 'f': 5 };
@@ -409,14 +432,17 @@
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
             
-            // Generate a dynamic filename based on the current filter selection
+            // Generate a dynamic filename based on the current filter selections
             const teamNum = document.getElementById('teamNumber').value;
             const yearNum = document.getElementById('year').value;
+            const eventFilter = document.getElementById('eventFilter').value;
             const filterMode = document.getElementById('filterMode').value;
+            
+            const eventSuffix = eventFilter === 'all' ? '' : `_${eventFilter}`;
             const filterSuffix = filterMode === 'all' ? 'all_matches' : `${filterMode}s_only`;
             
             link.setAttribute("href", url);
-            link.setAttribute("download", `team_${teamNum}_videos_${yearNum}_${filterSuffix}.csv`);
+            link.setAttribute("download", `team_${teamNum}_videos_${yearNum}${eventSuffix}_${filterSuffix}.csv`);
             link.style.visibility = 'hidden';
             
             document.body.appendChild(link);
