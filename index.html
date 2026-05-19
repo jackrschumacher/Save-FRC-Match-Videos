@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,21 +9,26 @@
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            max-width: 800px;
+            max-width: 900px;
             margin: 2rem auto;
             padding: 0 1rem;
             background-color: #f4f4f9;
             color: #333;
         }
+
         .card {
             background: white;
             padding: 2rem;
             border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             margin-bottom: 2rem;
         }
-        h1 { color: #3f51b5; margin-top: 0; }
-        
+
+        h1 {
+            color: #3f51b5;
+            margin-top: 0;
+        }
+
         .docs-box {
             background: #e8eaf6;
             padding: 0.5rem 1rem;
@@ -30,94 +36,250 @@
             margin-bottom: 1.5rem;
             border-left: 4px solid #3f51b5;
         }
+
         .docs-box summary {
             font-weight: bold;
             cursor: pointer;
             color: #303f9f;
         }
+
         .docs-box ol {
             margin-top: 0.5rem;
             margin-bottom: 0.5rem;
             padding-left: 1.5rem;
         }
 
-        .form-group { margin-bottom: 1rem; position: relative; }
-        label { display: block; font-weight: bold; margin-bottom: 0.5rem; }
-        input[type="text"], input[type="number"], select {
-            width: 100%; padding: 0.5rem; box-sizing: border-box;
-            border: 1px solid #ccc; border-radius: 4px;
-            background-color: white; font-size: 1rem;
+        .form-group {
+            margin-bottom: 1rem;
+            position: relative;
         }
-        
-        .input-wrapper { display: flex; gap: 0.5rem; }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 0.5rem;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: white;
+            font-size: 1rem;
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 0.5rem;
+        }
+
         .btn-clear {
-            background-color: #e0e0e0; color: #333; border: none;
-            padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;
+            background-color: #e0e0e0;
+            color: #333;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
             font-weight: bold;
         }
-        .btn-clear:hover { background-color: #ccc; }
+
+        .btn-clear:hover {
+            background-color: #ccc;
+        }
 
         button {
-            background-color: #3f51b5; color: white; border: none;
-            padding: 0.75rem 1.5rem; border-radius: 4px; cursor: pointer;
-            font-size: 1rem; font-weight: bold; margin-right: 0.5rem; margin-bottom: 0.5rem;
+            background-color: #3f51b5;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
         }
-        button.main-btn:hover { background-color: #303f9f; }
-        button:disabled { background-color: #9fa8da; cursor: not-allowed; }
-        
-        .btn-success { background-color: #4caf50; }
-        .btn-success:hover { background-color: #388e3c; }
-        
-        .btn-youtube { background-color: #ff0000; }
-        .btn-youtube:hover { background-color: #cc0000; }
-        
-        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #ddd; }
-        th { background-color: #f8f9fa; }
-        .event-code { font-size: 0.85em; color: #666; display: block; margin-top: 2px; }
-        a { color: #d32f2f; text-decoration: none; font-weight: bold; }
-        a:hover { text-decoration: underline; }
-        #status { margin-top: 1rem; font-style: italic; color: #666; }
-        .saved-badge { color: #4caf50; font-size: 0.85rem; font-weight: bold; display: none; margin-left: 0.5rem; }
-        
-        .github-link { display: inline-block; margin-bottom: 1.5rem; font-size: 0.9rem;  }
 
-        /* Match Result Badges */
-        .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.85em; text-transform: uppercase; }
-        .badge.win { background-color: #e8f5e9; color: #2e7d32; }
-        .badge.loss { background-color: #ffebee; color: #c62828; }
-        .badge.tie { background-color: #fff8e1; color: #f57f17; }
-        .badge.na { background-color: #f5f5f5; color: #9e9e9e; }
-        
-        .score-text { 
-            font-size: 0.8em; 
-            color: #555; 
-            margin-top: 4px; 
-            font-variant-numeric: tabular-nums;
-            white-space: nowrap; 
+        button.main-btn:hover {
+            background-color: #303f9f;
         }
-        
-        .controls-row { display: flex; gap: 1rem; margin-bottom: 1rem; background: #f8f9fa; padding: 1rem; border-radius: 8px; border: 1px solid #eee; flex-wrap: wrap; }
-        .hint-text { font-size: 0.85rem; color: #666; font-weight: normal; margin-left: 0.5rem; }
+
+        button:disabled {
+            background-color: #9fa8da;
+            cursor: not-allowed;
+        }
+
+        .btn-success {
+            background-color: #4caf50;
+        }
+
+        .btn-success:hover {
+            background-color: #388e3c;
+        }
+
+        .btn-youtube {
+            background-color: #ff0000;
+        }
+
+        .btn-youtube:hover {
+            background-color: #cc0000;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f8f9fa;
+        }
+
+        .event-code {
+            font-size: 0.85em;
+            color: #666;
+            display: block;
+            margin-top: 2px;
+        }
+
+        a {
+            color: #d32f2f;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        #status {
+            margin-top: 1rem;
+            font-style: italic;
+            color: #666;
+        }
+
+        .saved-badge {
+            color: #4caf50;
+            font-size: 0.85rem;
+            font-weight: bold;
+            display: none;
+            margin-left: 0.5rem;
+        }
+
+        .github-link {
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.85em;
+            text-transform: uppercase;
+        }
+
+        .badge.win {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .badge.loss {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+
+        .badge.tie {
+            background-color: #fff8e1;
+            color: #f57f17;
+        }
+
+        .badge.na {
+            background-color: #f5f5f5;
+            color: #9e9e9e;
+        }
+
+        .badge.red-win {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+
+        .badge.blue-win {
+            background-color: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .score-text {
+            font-size: 0.8em;
+            color: #555;
+            margin-top: 4px;
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+        }
+
+        .publisher-text {
+            font-size: 0.85em;
+            color: #444;
+            background: #eee;
+            padding: 3px 6px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .controls-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            flex-wrap: wrap;
+        }
+
+        .hint-text {
+            font-size: 0.85rem;
+            color: #666;
+            font-weight: normal;
+            margin-left: 0.5rem;
+        }
     </style>
 </head>
+
 <body>
 
     <div class="card">
         <h1>Save FRC match videos from The Blue Alliance</h1>
-        <p style="margin-bottom: 0.5rem;">Pull organized YouTube links for any FRC team or event directly from The Blue Alliance API.</p>
-        <a href="https://github.com/jackrschumacher/Save-FRC-Match-Videos" target="_blank" class="github-link">View Source Code on GitHub</a>
-        
+        <p style="margin-bottom: 0.5rem;">Pull organized YouTube links for any FRC team or event directly from The Blue
+            Alliance API.</p>
+        <a href="https://github.com/jackrschumacher/Save-FRC-Match-Videos" target="_blank" class="github-link">View
+            Source Code on GitHub</a>
+
         <details class="docs-box">
             <summary>How do I get a free TBA API Key?</summary>
             <ol>
-                <li>Go to <a href="https://www.thebluealliance.com/account" target="_blank">thebluealliance.com/account</a> and log in.</li>
+                <li>Go to <a href="https://www.thebluealliance.com/account"
+                        target="_blank">thebluealliance.com/account</a> and log in.</li>
                 <li>Scroll down to the <strong>Read API Keys</strong> section.</li>
-                <li>Type a description (like "Video Extractor") into the text box and click <strong>Add New Key</strong>.</li>
+                <li>Type a description (like "Video Extractor") into the text box and click <strong>Add New
+                        Key</strong>.</li>
                 <li>Copy the long string of letters and numbers it generates and paste it into the field below.</li>
             </ol>
         </details>
-        
+
         <div class="form-group">
             <label for="apiKey">
                 TBA API Read Key:
@@ -128,35 +290,36 @@
                 <button type="button" class="btn-clear" onclick="clearApiKey()" title="Remove saved key">Clear</button>
             </div>
         </div>
-        
+
         <div style="display: flex; gap: 1rem;">
             <div class="form-group" style="flex: 1;">
-                <label for="year">Year:</label>
-                <select id="year" onchange="loadEvents()"></select>
+                <label for="teamNumber">Team Number: <span class="hint-text">(Optional)</span></label>
+                <input type="number" id="teamNumber" placeholder="e.g., 930" min="1" oninput="handleTeamInput()">
             </div>
-            <div class="form-group" style="flex: 2;">
-                <label for="teamNumber">Team Number: <span class="hint-text">(Optional if Event is selected)</span></label>
-                <input type="number" id="teamNumber" placeholder="e.g., 930" min="1">
+            <div class="form-group" style="flex: 1;">
+                <label for="year">Year:</label>
+                <select id="year" onchange="handleYearChange()"></select>
             </div>
         </div>
 
         <div class="form-group">
-            <label for="eventSelect">Specific Event: <span class="hint-text">(Optional if Team Number is entered)</span></label>
-            <select id="eventSelect">
-                <option value="all">All Events (Requires Team Number)</option>
-            </select>
+            <label for="eventSelectInput">Search Event: <span class="hint-text">(Leave blank to fetch all matches for
+                    the Team above)</span></label>
+            <input type="text" id="eventSelectInput" list="eventOptions" placeholder="Waiting for API Key...">
+            <datalist id="eventOptions"></datalist>
         </div>
 
         <button id="fetchBtn" class="main-btn" onclick="fetchVideos()">Fetch Matches</button>
         <button id="exportBtn" class="btn-success" onclick="exportToCSV()" style="display: none;">Export to CSV</button>
-        <button id="playlistBtn" class="btn-youtube" onclick="openPlaylist()" style="display: none;">▶ Open as YouTube Playlist</button>
-        
+        <button id="playlistBtn" class="btn-youtube" onclick="openPlaylist()" style="display: none;">▶ Open as YouTube
+            Playlist</button>
+
         <div id="status"></div>
     </div>
 
     <div class="card" id="resultsCard" style="display: none;">
         <h2>Match Videos</h2>
-        
+
         <div class="controls-row">
             <div style="flex: 1; min-width: 150px;">
                 <label for="internalEventFilter" style="font-size: 0.9em;">Filter by Event:</label>
@@ -189,25 +352,28 @@
                     <th>Event</th>
                     <th>Match</th>
                     <th>Result</th>
+                    <th>Publisher</th>
                     <th>Link</th>
                 </tr>
             </thead>
             <tbody id="resultsBody">
-                </tbody>
+            </tbody>
         </table>
     </div>
-    
+
     <script>
         let globalMatchData = [];
         let globalFilteredData = [];
         let globalFilteredVideoIds = [];
-        let globalEventDict = {}; // Maps event_key -> event_name
+        let globalEventDict = {};
+        let typingTimer;
+        let currentFetchId = 0;
 
-        window.onload = function() {
+        window.onload = function () {
             const currentYear = new Date().getFullYear();
             const startYear = 1992;
             const yearSelect = document.getElementById('year');
-            
+
             for (let y = currentYear; y >= startYear; y--) {
                 const option = document.createElement('option');
                 option.value = y;
@@ -219,7 +385,7 @@
             if (savedKey) {
                 document.getElementById('apiKey').value = savedKey;
                 document.getElementById('savedBadge').style.display = 'inline';
-                loadEvents(); // Auto-load events if key exists
+                loadEvents();
             }
         };
 
@@ -229,49 +395,61 @@
             document.getElementById('savedBadge').style.display = 'none';
         }
 
-        // New function to fetch all events for the selected year
+        function handleTeamInput() {
+            clearTimeout(typingTimer);
+            typingTimer = setTimeout(loadEvents, 600);
+        }
+
+        // New function to clear the event search box when the year is specifically changed
+        function handleYearChange() {
+            document.getElementById('eventSelectInput').value = '';
+            loadEvents();
+        }
+
         async function loadEvents() {
             const apiKey = document.getElementById('apiKey').value.trim();
             const year = document.getElementById('year').value;
-            const eventSelect = document.getElementById('eventSelect');
-            
+            const teamNumber = document.getElementById('teamNumber').value.trim();
+            const eventInput = document.getElementById('eventSelectInput');
+            const eventOptions = document.getElementById('eventOptions');
+
             if (!apiKey) {
-                eventSelect.innerHTML = '<option value="all">All Events (Requires Team Number)</option>';
+                eventInput.placeholder = 'Waiting for API Key...';
                 return;
             }
 
-            eventSelect.innerHTML = '<option value="all">Loading events for ' + year + '...</option>';
-            eventSelect.disabled = true;
+            const isTeamValid = teamNumber !== "" && parseInt(teamNumber) > 0;
+
+            const url = isTeamValid
+                ? `https://www.thebluealliance.com/api/v3/team/frc${teamNumber}/events/${year}/simple`
+                : `https://www.thebluealliance.com/api/v3/events/${year}/simple`;
+
+            eventOptions.innerHTML = '';
+            eventInput.placeholder = 'Loading events...';
 
             try {
-                const res = await fetch(`https://www.thebluealliance.com/api/v3/events/${year}/simple`, {
-                    headers: { 'X-TBA-Auth-Key': apiKey }
-                });
-                
+                const res = await fetch(url, { headers: { 'X-TBA-Auth-Key': apiKey } });
                 if (!res.ok) throw new Error("API Error");
-                
+
                 const events = await res.json();
-                globalEventDict = {}; // reset dictionary
-                
-                // Sort events chronologically by start date
+                globalEventDict = {};
+
                 events.sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
 
-                eventSelect.innerHTML = '<option value="all">All Events (Requires Team Number)</option>';
-                
                 events.forEach(e => {
                     globalEventDict[e.key] = e.name;
                     const opt = document.createElement('option');
-                    opt.value = e.key;
-                    // Add the event code so it's searchable by typing
-                    opt.text = `${e.name} (${e.event_code.toUpperCase()})`;
-                    eventSelect.appendChild(opt);
+                    opt.value = `${e.name} (${e.key})`;
+                    eventOptions.appendChild(opt);
                 });
-                
+
+                eventInput.placeholder = isTeamValid
+                    ? `Type to search ${events.length} events for Team ${teamNumber}...`
+                    : `Type to search ${events.length} worldwide events...`;
+
             } catch (e) {
-                eventSelect.innerHTML = '<option value="all">Error loading events. Check API Key.</option>';
+                eventInput.placeholder = 'Error loading events. Check API Key.';
                 console.error(e);
-            } finally {
-                eventSelect.disabled = false;
             }
         }
 
@@ -286,51 +464,82 @@
         }
 
         async function fetchVideos() {
+            currentFetchId++;
+            const activeFetchId = currentFetchId;
+
             const apiKey = document.getElementById('apiKey').value.trim();
             const teamNumber = document.getElementById('teamNumber').value.trim();
             const year = document.getElementById('year').value;
-            const eventSelect = document.getElementById('eventSelect').value;
-            
+            const rawEvent = document.getElementById('eventSelectInput').value.trim();
+
             const statusDiv = document.getElementById('status');
             const fetchBtn = document.getElementById('fetchBtn');
             const internalEventFilter = document.getElementById('internalEventFilter');
+
+            const isTeamValid = teamNumber !== "" && parseInt(teamNumber) > 0;
 
             if (!apiKey) {
                 alert("Please enter your TBA API Key.");
                 return;
             }
-            
-            if (!teamNumber && eventSelect === 'all') {
-                alert("Please either enter a Team Number OR select a specific Event from the dropdown.");
+
+            let eventSelect = 'all';
+            if (rawEvent) {
+                const match = rawEvent.match(/\(([^)]+)\)$/);
+                if (match) {
+                    eventSelect = match[1];
+                } else {
+                    eventSelect = rawEvent.toLowerCase();
+                }
+            }
+
+            if (!isTeamValid && eventSelect === 'all') {
+                alert("Please enter a Team Number to fetch their matches, OR select a specific Event to fetch its matches.");
                 return;
             }
 
             statusDiv.textContent = "Fetching data from The Blue Alliance...";
             fetchBtn.disabled = true;
             globalMatchData = [];
+            let rowIdCounter = 0;
             internalEventFilter.innerHTML = '<option value="all">All Fetched Events</option>';
 
-            // Determine which TBA endpoint to hit based on inputs
             let matchesEndpoint = '';
-            if (teamNumber && eventSelect === 'all') {
+            let eventsEndpoint = '';
+
+            if (isTeamValid && eventSelect === 'all') {
                 matchesEndpoint = `https://www.thebluealliance.com/api/v3/team/frc${teamNumber}/matches/${year}`;
-            } else if (teamNumber && eventSelect !== 'all') {
+                eventsEndpoint = `https://www.thebluealliance.com/api/v3/team/frc${teamNumber}/events/${year}/simple`;
+            } else if (isTeamValid && eventSelect !== 'all') {
                 matchesEndpoint = `https://www.thebluealliance.com/api/v3/team/frc${teamNumber}/event/${eventSelect}/matches`;
-            } else if (!teamNumber && eventSelect !== 'all') {
+                eventsEndpoint = `https://www.thebluealliance.com/api/v3/event/${eventSelect}/simple`;
+            } else if (!isTeamValid && eventSelect !== 'all') {
                 matchesEndpoint = `https://www.thebluealliance.com/api/v3/event/${eventSelect}/matches`;
+                eventsEndpoint = `https://www.thebluealliance.com/api/v3/event/${eventSelect}/simple`;
             }
 
             try {
-                const res = await fetch(matchesEndpoint, { headers: { 'X-TBA-Auth-Key': apiKey } });
-                
-                if (!res.ok) {
+                const [matchesRes, eventsRes] = await Promise.all([
+                    fetch(matchesEndpoint, { headers: { 'X-TBA-Auth-Key': apiKey } }),
+                    fetch(eventsEndpoint, { headers: { 'X-TBA-Auth-Key': apiKey } })
+                ]);
+
+                if (!matchesRes.ok || !eventsRes.ok) {
                     throw new Error(`API Error: Check your inputs or API key.`);
                 }
 
                 localStorage.setItem('tbaApiKey', apiKey);
                 document.getElementById('savedBadge').style.display = 'inline';
 
-                const matches = await res.json();
+                const eventsData = await eventsRes.json();
+                const eventDict = {};
+                if (Array.isArray(eventsData)) {
+                    eventsData.forEach(e => { eventDict[e.key] = e.name; });
+                } else if (eventsData && eventsData.key) {
+                    eventDict[eventsData.key] = eventsData.name;
+                }
+
+                const matches = await matchesRes.json();
                 const matchesWithVideos = matches.filter(match => match.videos && match.videos.length > 0);
 
                 if (matchesWithVideos.length === 0) {
@@ -342,18 +551,17 @@
                     return;
                 }
 
-                const targetTeam = teamNumber ? `frc${teamNumber}` : null;
+                const targetTeam = isTeamValid ? `frc${teamNumber}` : null;
 
                 matchesWithVideos.forEach(match => {
                     match.videos.forEach(video => {
                         if (video.type === 'youtube') {
-                            
+
                             let resultText = "N/A";
                             let resultClass = "na";
                             let resultSortVal = 4;
                             let scoreText = "";
 
-                            // Calculate Win/Loss only if a specific team was searched
                             if (match.alliances.red.score >= 0 && match.alliances.blue.score >= 0) {
                                 if (targetTeam) {
                                     let alliance = null;
@@ -375,15 +583,22 @@
                                         }
                                     }
                                 } else {
-                                    // If no team is searched, just show standard Red vs Blue score
                                     scoreText = `Red: ${match.alliances.red.score} - Blue: ${match.alliances.blue.score}`;
+
+                                    if (match.winning_alliance === 'red') {
+                                        resultText = "Red Win"; resultClass = "red-win"; resultSortVal = 1;
+                                    } else if (match.winning_alliance === 'blue') {
+                                        resultText = "Blue Win"; resultClass = "blue-win"; resultSortVal = 2;
+                                    } else {
+                                        resultText = "Tie"; resultClass = "tie"; resultSortVal = 3;
+                                    }
                                 }
                             }
 
-                            // Use the global dictionary to find the event name, fallback to key
-                            const eName = globalEventDict[match.event_key] || match.event_key;
+                            const eName = eventDict[match.event_key] || match.event_key;
 
                             globalMatchData.push({
+                                rowId: rowIdCounter++,
                                 eventName: eName,
                                 eventCode: match.event_key.toUpperCase(),
                                 comp_level: match.comp_level,
@@ -395,13 +610,13 @@
                                 resultText: resultText,
                                 resultClass: resultClass,
                                 resultSortVal: resultSortVal,
-                                scoreText: scoreText
+                                scoreText: scoreText,
+                                publisher: "Loading..."
                             });
                         }
                     });
                 });
 
-                // Populate the internal filter dropdown (Useful if user searched a team across the whole year)
                 const uniqueEventCodes = [...new Set(globalMatchData.map(item => item.eventCode))];
                 uniqueEventCodes.forEach(code => {
                     const eName = globalMatchData.find(item => item.eventCode === code).eventName;
@@ -411,13 +626,14 @@
                     internalEventFilter.appendChild(option);
                 });
 
-                statusDiv.textContent = `Found ${globalMatchData.length} total videos!`;
-                
+                statusDiv.textContent = `Found ${globalMatchData.length} total videos! Loading publishers in the background...`;
+
                 document.getElementById('resultsCard').style.display = 'block';
                 document.getElementById('exportBtn').style.display = 'inline-block';
                 document.getElementById('playlistBtn').style.display = 'inline-block';
-                
+
                 renderTable();
+                loadPublishers(activeFetchId);
 
             } catch (error) {
                 statusDiv.textContent = `Error: ${error.message}`;
@@ -427,25 +643,58 @@
             }
         }
 
+        async function loadPublishers(fetchId) {
+            const batchSize = 5;
+
+            for (let i = 0; i < globalMatchData.length; i += batchSize) {
+                if (fetchId !== currentFetchId) return;
+
+                const batch = globalMatchData.slice(i, i + batchSize);
+
+                await Promise.all(batch.map(async (row) => {
+                    if (row.publisher !== 'Loading...') return;
+
+                    try {
+                        const res = await fetch(`https://noembed.com/embed?url=${row.url}`);
+                        const data = await res.json();
+                        row.publisher = data.author_name || 'Unknown';
+                    } catch (e) {
+                        row.publisher = 'Unknown';
+                    }
+
+                    const pubCell = document.getElementById(`pub-${row.rowId}`);
+                    if (pubCell) {
+                        pubCell.textContent = row.publisher;
+                    }
+                }));
+            }
+
+            if (fetchId === currentFetchId) {
+                document.getElementById('status').textContent = `Found ${globalMatchData.length} total videos! All data loaded.`;
+            }
+        }
+
         function renderTable() {
             const resultsBody = document.getElementById('resultsBody');
             const internalEventFilter = document.getElementById('internalEventFilter').value;
             const filterMode = document.getElementById('filterMode').value;
             const sortMode = document.getElementById('sortMode').value;
-            
+
             resultsBody.innerHTML = '';
             globalFilteredVideoIds = [];
 
             globalFilteredData = globalMatchData.filter(row => {
                 if (internalEventFilter !== 'all' && row.eventCode !== internalEventFilter) return false;
-                if (filterMode === 'win' && row.resultClass !== 'win') return false;
+
+                if (filterMode === 'win' && !(row.resultClass === 'win' || row.resultClass === 'red-win' || row.resultClass === 'blue-win')) return false;
                 if (filterMode === 'loss' && row.resultClass !== 'loss') return false;
                 if (filterMode === 'tie' && row.resultClass !== 'tie') return false;
+
                 return true;
             });
 
             const levelOrder = { 'qm': 1, 'ef': 2, 'qf': 3, 'sf': 4, 'f': 5 };
-            
+
             globalFilteredData.sort((a, b) => {
                 if (sortMode === 'result' && a.resultSortVal !== b.resultSortVal) {
                     return a.resultSortVal - b.resultSortVal;
@@ -461,7 +710,7 @@
 
             globalFilteredData.forEach(row => {
                 globalFilteredVideoIds.push(row.videoId);
-                
+
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>
@@ -473,40 +722,46 @@
                         <span class="badge ${row.resultClass}">${row.resultText}</span>
                         ${row.scoreText ? `<div class="score-text">${row.scoreText}</div>` : ''}
                     </td>
+                    <td>
+                        <span id="pub-${row.rowId}" class="publisher-text">${row.publisher}</span>
+                    </td>
                     <td><a href="${row.url}" target="_blank">Watch on YouTube ↗</a></td>
                 `;
                 resultsBody.appendChild(tr);
             });
-            
+
             if (globalFilteredData.length === 0) {
-                resultsBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color: #666;">No matches match your current filter.</td></tr>`;
+                resultsBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color: #666;">No matches match your current filter.</td></tr>`;
             }
         }
 
         function exportToCSV() {
             if (globalFilteredData.length === 0) return;
-            let csvContent = "Event Name,Event Code,Match,Result,Score,YouTube Link\n";
+            let csvContent = "Event Name,Event Code,Match,Result,Score,Publisher,YouTube Link\n";
             globalFilteredData.forEach(row => {
                 const escapedEvent = `"${row.eventName}"`;
-                csvContent += `${escapedEvent},${row.eventCode},${row.matchName},${row.resultText},${row.scoreText},${row.url}\n`;
+                const escapedPub = `"${row.publisher}"`;
+                csvContent += `${escapedEvent},${row.eventCode},${row.matchName},${row.resultText},${row.scoreText},${escapedPub},${row.url}\n`;
             });
-            
+
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
-            
-            const teamNum = document.getElementById('teamNumber').value || "ALL";
+
+            let teamNum = document.getElementById('teamNumber').value.trim();
+            teamNum = (teamNum !== "" && parseInt(teamNum) > 0) ? teamNum : "ALL_TEAMS";
+
             const yearNum = document.getElementById('year').value;
             const eventFilter = document.getElementById('internalEventFilter').value;
             const filterMode = document.getElementById('filterMode').value;
-            
+
             const eventSuffix = eventFilter === 'all' ? '' : `_${eventFilter}`;
             const filterSuffix = filterMode === 'all' ? 'all_matches' : `${filterMode}s_only`;
-            
+
             link.setAttribute("href", url);
             link.setAttribute("download", `team_${teamNum}_videos_${yearNum}${eventSuffix}_${filterSuffix}.csv`);
             link.style.visibility = 'hidden';
-            
+
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -525,6 +780,7 @@
             }
         }
     </script>
-    
+
 </body>
+
 </html>
